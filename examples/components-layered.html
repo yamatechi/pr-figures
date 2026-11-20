@@ -1,0 +1,67 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=../assets/common.css><link rel=stylesheet href=../assets/overview.css><link rel=stylesheet href=../assets/components.css>
+<style>
+body{width:2210px}
+.c .m{overflow-wrap:normal;word-break:normal}
+.grid{grid-template-columns:116px 210px 210px 26px 210px 210px 210px 26px 210px 210px 210px 8px;column-gap:22px;row-gap:14px;align-items:center}
+.band{grid-column:1 / -1;align-self:stretch;background:#eceff4;border-radius:12px}
+.band.alt{background:#f4f6f9}
+.ll{grid-column:1;padding-left:16px;display:flex;flex-direction:column;gap:2px}
+.ll b{font-size:17px}
+.ll span{font-size:11.5px;white-space:nowrap;color:var(--muted)}
+.c{margin:20px 0}
+.colh{grid-row:1;text-align:center;font-weight:700;font-size:16px;padding:4px 0;border-bottom:3px solid #b9bfca}
+.colh span{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
+.sep{grid-row:2 / 6;align-self:stretch;justify-self:center;border-left:2px dashed #c3c8d2}
+</style>
+<div class=page>
+<div><h1>料理教室の予約とリマインドの仕組み（予定：後続の PR がすべて入ったあと）</h1><div class=sub>会員の予約は空きを確かめてから作り、確認と前日のリマインドのメールは基盤のキューから送る。運営者は開講日と名簿を扱う</div></div>
+<div class=legend><span><i style="background:var(--ok-s);border-color:#9fd2b5"></i>新しく作る（ほかの PR）</span><span><i style="background:var(--acc-s);border:2px solid var(--acc)"></i>この PR（#52）で作る・手を入れる</span><span><i style="background:#fff"></i>手を入れる（ほかの PR）</span><span><i style="background:#f6f7f9"></i>今のまま</span></div>
+<div id=wrap>
+<svg id=arrows></svg>
+<div class=grid>
+<div class=colh style="grid-column:2 / 4">会員<span>予約する</span></div>
+<div class=colh style="grid-column:5 / 8">予約の基盤<span>空きの判定と通知</span></div>
+<div class=colh style="grid-column:9 / 12">教室の運営者<span>開講日を決める・名簿を見る</span></div>
+<div class="band" style="grid-row:2"></div><div class=ll style="grid-row:2"><b>画面</b><span>frontend</span></div>
+<div class="band alt" style="grid-row:3"></div><div class=ll style="grid-row:3"><b>入口</b><span>API・定期実行</span></div>
+<div class="band" style="grid-row:4"></div><div class=ll style="grid-row:4"><b>処理</b><span>worker・ドメイン</span></div>
+<div class="band alt" style="grid-row:5"></div><div class=ll style="grid-row:5"><b>DB</b><span>送り先</span></div>
+<div class=sep style="grid-column:4"></div>
+<div class=sep style="grid-column:8"></div>
+<div class="c" id=mypage style="grid-row:2;grid-column:2"><div class=n>マイページ</div><div class=m>pages/me/bookings</div><div class=d>自分の予約を見る・取り消す</div></div>
+<div class="c new" id=book style="grid-row:2;grid-column:3"><span class=tag>新</span><div class=n>予約の画面</div><div class=m>pages/classes/[id]/book</div><div class=d>空いている回を選んで予約する</div></div>
+<div class="c" id=slotui style="grid-row:2;grid-column:10"><div class=n>開講日の管理画面</div><div class=m>admin/schedules</div><div class=d>開講日と定員を登録する</div></div>
+<div class="c new" id=roster style="grid-row:2;grid-column:11"><span class=tag>新</span><div class=n>出席者の名簿</div><div class=m>admin/rosters</div><div class=d>当日の予約者を一覧で見る</div></div>
+<div class="c mod" id=myapi style="grid-row:3;grid-column:2"><span class=tag>手を入れる</span><div class=n>自分の予約の API</div><div class=m>GET /v1/me/bookings</div><div class=d>取り消し済みも区別して返す</div></div>
+<div class="c me" id=bookapi style="grid-row:3;grid-column:3"><span class="tag me">#52</span><div class=n>予約の API</div><div class=m>POST /v1/bookings</div><div class=d>空きを確かめて予約を作る</div></div>
+<div class="c new" id=cron style="grid-row:3;grid-column:7"><span class=tag>新</span><div class=n>前日のリマインド</div><div class=m>send-reminders</div><div class=d>18 時に翌日の予約者を積む</div></div>
+<div class="c mod" id=slotapi style="grid-row:3;grid-column:10"><span class=tag>手を入れる</span><div class=n>開講日の API</div><div class=m>PUT /v1/admin/slots/{id}</div><div class=d>定員を予約数より下げられない</div></div>
+<div class="c new" id=rosterapi style="grid-row:3;grid-column:11"><span class=tag>新</span><div class=n>名簿の API</div><div class=m>GET /v1/admin/slots/{id}/roster</div><div class=d>回ごとの予約者を返す</div></div>
+<div class="c me" id=capacity style="grid-row:4;grid-column:5"><span class="tag me">#52</span><div class=n>空きの判定</div><div class=m>SlotCapacityPolicy</div><div class=d>定員と予約数を比べる</div></div>
+<div class="c me" id=queue style="grid-row:4;grid-column:6"><span class="tag me">#52</span><div class=n>通知のキュー</div><div class=m>notification-jobs</div><div class=d>送るメールを順に並べる</div></div>
+<div class="c me" id=worker style="grid-row:4;grid-column:7"><span class="tag me">#52</span><div class=n>通知のワーカー</div><div class=m>NotificationWorker</div><div class=d>メールを送り、履歴に書く</div></div>
+<div class="c me" id=bookings style="grid-row:5;grid-column:2 / 4"><span class="tag me">#52</span><div class=n>予約の表</div><div class=m>booking</div><div class=d>会員・回・状態（予約中・取り消し）</div></div>
+<div class="c me" id=history style="grid-row:5;grid-column:6"><span class="tag me">#52</span><div class=n>通知の履歴</div><div class=m>notification_log</div><div class=d>同じ通知を二度送らない</div></div>
+<div class="c" id=mail style="grid-row:5;grid-column:7"><div class=n>メール配信（外部）</div><div class=d>確認とリマインドのメール</div></div>
+<div class="c mod" id=slots style="grid-row:5;grid-column:10 / 12"><span class=tag>手を入れる</span><div class=n>開講日の表</div><div class=m>class_slot</div><div class=d>日時・定員</div></div>
+</div></div>
+</div>
+<script>
+window.ARROWS=[
+ ['mypage','myapi','b','t',''],
+ ['book','bookapi','b','t',''],
+ ['slotui','slotapi','b','t',''],
+ ['roster','rosterapi','b','t',''],
+ ['myapi','bookings','b','tl','読む'],
+ ['bookapi','capacity','r','t','空きを聞く',0.3,'above'],
+ ['capacity','bookings','b','r','予約を書く',0.6,'left'],
+ ['capacity','queue','r','l',''],
+ ['cron','queue','b','t','積む',0.5,'left'],
+ ['queue','worker','r','l',''],
+ ['worker','mail','b','t','送る'],
+ ['worker','history','b','r','書く',0.5,'left'],
+ ['slotapi','slots','b','tl','書く'],
+ ['rosterapi','slots','b','tr','読む'],
+];
+</script>
+<script src=../assets/arrows.js></script>

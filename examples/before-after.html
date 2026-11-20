@@ -1,0 +1,14 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=../assets/common.css><link rel=stylesheet href=../assets/overview.css>
+<div class=page>
+<div><h1>#212 タイムラインをサムネイルで出し、判定を通った写真だけを公開する</h1><div class=sub>スマホでタイムラインが重く、確認前の写真が誰にでも見えていたため、投稿と表示の流れを分ける</div></div>
+<div class=cols>
+<div class="col before"><h2>これまで</h2>
+<div class=case><h3>タイムラインを開く</h3><div class=flow><div class=box>一覧の API</div><span class=ar>→</span><div class="box bad">原本（1 枚 数 MB）をそのまま読む</div></div><div class=small>20 枚で数十 MB。モバイル回線では表示に 10 秒以上かかる</div></div>
+<div class=case><h3>写真を投稿する</h3><div class=flow><div class=box>写真を送る</div><span class=ar>→</span><div class="box bad">すぐに公開</div></div><div class=small>不適切な写真も、確認される前にフォロワーへ届く</div></div>
+</div>
+<div class="col after"><h2>この PR のあと</h2>
+<div class=case><h3>タイムラインを開く</h3><div class=flow><div class=box>一覧の API</div><span class=ar>→</span><div class="box good">サムネイル（CDN）を読む</div></div><div class=small>原本は詳細画面で拡大したときだけ読む</div></div>
+<div class=case><h3>写真を投稿する</h3><div class=flow><div class=box>写真を送る</div><span class=ar>→</span><div class=box>処理待ち</div><span class=ar>→</span><div class="box api">サムネイル作成・判定</div><span class=ar>→</span><div class="box good">公開</div></div><div class=small>処理待ちの間は、投稿した本人にだけ「処理中」と見える</div></div>
+</div></div>
+<div class=note>既存の投稿のサムネイルは別のスクリプトで作る。作り終えるまでは、サムネイルの無い投稿だけ原本を出す</div>
+</div>

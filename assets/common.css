@@ -1,0 +1,10 @@
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1b2230;--muted:#5f6878;--line:#d9dee6;--ok:#1f7a4d;--ok-s:#e3f3ea;--warn:#9a5b00;--warn-s:#fbefd9;--acc:#2f55c8;--acc-s:#e7edfc;--todo:#8a91a0}
+html,body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",sans-serif}
+.page{padding:36px 44px;display:flex;flex-direction:column;gap:22px}
+h1{font-size:26px;font-weight:700;letter-spacing:.01em}
+.sub{font-size:15px;color:var(--muted);margin-top:6px}
+.mono{font-family:"SF Mono",Menlo,monospace;font-size:.92em}
+.legend{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px}

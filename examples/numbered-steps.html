@@ -1,0 +1,17 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=../assets/common.css><link rel=stylesheet href=../assets/overview.css>
+<style>.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.st{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}.st b{font-size:13px;color:var(--acc)}.st .t{font-size:15px;font-weight:700;line-height:1.45}.st .d{font-size:13px;color:var(--muted);line-height:1.55}.row2{display:grid;grid-template-columns:1fr 1fr;gap:20px}.row2 .flow{flex-wrap:nowrap;gap:6px}.row2 .box{font-size:13px;padding:6px 9px;white-space:nowrap}</style>
+<div class=page>
+<div><h1>#215 古いストレージの写真を新しいストレージへ移すスクリプト</h1><div class=sub>古いストレージの契約が来月で終わるため、写真を 100 件ずつ次の順で移す。途中で止まっても、流し直せば移していない分だけが進む</div></div>
+<div class=steps>
+<div class=st><b>1</b><div class=t>移す写真を数える</div><div class=d>古いストレージにだけある写真の件数と合計サイズを出す</div></div>
+<div class=st><b>2</b><div class=t>新しいストレージへコピー</div><div class=d>100 件ずつ。コピー先に同じキーがあれば飛ばす</div></div>
+<div class=st><b>3</b><div class=t>中身を照合する</div><div class=d>両方のハッシュを比べる。違えばその写真の参照は書き換えない</div></div>
+<div class=st><b>4</b><div class=t>参照を書き換える</div><div class=d>投稿の保存先を新しいストレージに。更新日時は変えない</div></div>
+<div class=st><b>5</b><div class=t>CDN のキャッシュを消す</div><div class=d>古い URL のキャッシュを無効にする</div></div>
+<div class=st><b>6</b><div class=t>集計する</div><div class=d>移した・飛ばした・止めた件数を出す。止めたものがあれば失敗で終える</div></div>
+</div>
+<div class=row2>
+<div class=col><h2>安全装置</h2><div class=note>既定は dry-run（何も書かない）。本実行は <span class=mono>--execute</span> が必須。<span class=mono>--limit</span> で件数を絞れる。古いストレージの写真は消さない（30 日後に別のスクリプトで消す）</div></div>
+<div class=col><h2>流す順</h2><div class=flow><div class=box>ステージングで dry-run</div><span class=ar>→</span><div class=box>100 件</div><span class=ar>→</span><div class=box>全件</div><span class=ar>→</span><div class="box good">本番も同じ順</div></div></div>
+</div>
+</div>

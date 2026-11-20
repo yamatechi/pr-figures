@@ -1,0 +1,20 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=../assets/common.css><link rel=stylesheet href=../assets/overview.css>
+<style>table{border-collapse:collapse;font-size:14px;width:100%}th,td{border-top:1px solid var(--line);padding:8px 10px;text-align:left}th{color:var(--muted);font-weight:600;font-size:13px}td.add{background:var(--ok-s);font-weight:700}.chips{display:flex;gap:8px}.chip{border:1.5px solid var(--line);border-radius:999px;padding:5px 14px;font-size:14px;background:#fff}.chip.on{border-color:var(--acc);background:var(--acc-s);color:var(--acc);font-weight:600}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}.card b{display:block}.card span{font-size:12.5px;color:var(--muted)}</style>
+<div class=page>
+<div><h1>#87 レシピの API が調理時間を返す</h1><div class=sub>「30 分以内で作れるもの」で探したいという声に応えるため、調理時間を画面へ渡す</div></div>
+<div class=cols>
+<div class=col><h2>レシピの API の応答</h2>
+<div class="mono small">GET /v1/recipes（検索・おすすめの API も同じ項目を返す）</div>
+<table><tr><th>レシピ</th><th>servings</th><th>cookingMinutes（追加）</th></tr>
+<tr><td>卵焼き</td><td>2</td><td class=add>10</td></tr>
+<tr><td>肉じゃが</td><td>4</td><td class=add>35</td></tr>
+<tr><td>（時間を登録していないレシピ）</td><td>3</td><td class=add>null</td></tr></table>
+<div class=note>値は投稿者が登録した時間。既存の項目は変わらない。未登録のレシピは null を返し、0 とは区別する</div>
+</div>
+<div class="col after"><h2>次の PR で画面が使う</h2>
+<div class=small>レシピの検索画面</div>
+<div class=chips><span class=chip>すべて</span><span class=chip>15 分以内</span><span class="chip on">30 分以内</span></div>
+<div class=cards><div class=card><b>卵焼き</b><span>10 分・2 人分</span></div><div class=card><b>きゅうりの浅漬け</b><span>15 分・2 人分</span></div></div>
+<div class=note>時間で絞り込むと、null のレシピは出さない。絞り込まないときは「時間未登録」と出す</div>
+</div></div>
+</div>

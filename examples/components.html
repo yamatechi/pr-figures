@@ -1,0 +1,50 @@
+<!doctype html><meta charset=utf-8><link rel=stylesheet href=../assets/common.css><link rel=stylesheet href=../assets/overview.css><link rel=stylesheet href=../assets/components.css>
+<style>.grid{grid-template-columns:300px 520px 640px}</style>
+<div class=page>
+<div><h1>写真の投稿と公開の構成図（予定：後続の PR がすべて入ったあと）</h1><div class=sub>投稿はすぐに公開せず、サムネイルを作って判定を通ったものだけを公開する。タイムラインはサムネイルを CDN から読む</div></div>
+<div class=legend><span><i style="background:var(--ok-s);border-color:#9fd2b5"></i>新しく作る（後続の PR）</span><span><i style="background:var(--acc-s);border:2px solid var(--acc)"></i>この PR（#213）で作る</span><span><i style="background:#fff"></i>手を入れる</span><span><i style="background:#f6f7f9"></i>今のまま</span></div>
+<div id=wrap>
+<svg id=arrows></svg>
+<div class=grid>
+
+<div class=grp><div class=gl>ブラウザ・アプリ</div>
+<div class=c id=form><div class=n>投稿の画面</div><div class=m>PhotoUploadForm</div><div class=d>写真を選んで送る</div></div>
+<div class="c mod" id=feed><span class=tag>手を入れる</span><div class=n>タイムライン</div><div class=m>FeedPage</div><div class=d>サムネイルを並べる</div></div>
+</div>
+
+<div class=grp><div class=gl>API サーバー</div>
+<div class="c mod" id=upload><span class=tag>手を入れる</span><div class=n>投稿の API</div><div class=m>POST /v1/photos</div><div class=d>原本を置き、投稿を「処理待ち」で作る</div></div>
+<div class="c mod" id=feedapi><span class=tag>手を入れる</span><div class=n>タイムラインの API</div><div class=m>GET /v1/feed</div><div class=d>「公開」の投稿とサムネイルの URL を返す</div></div>
+</div>
+
+<div class="grp focus"><div class=gl>画像処理 <span class=mono>photo-pipeline</span>（サーバーレス関数）</div>
+<div class=c id=originals><div class=n>原本のバケット</div><div class=m>photo-originals</div></div>
+<div class="c new" id=event><span class=tag>新</span><div class=n>保存のイベント</div><div class=m>object-created</div><div class=d>原本が置かれたら関数を起こす</div></div>
+<div class="c me" id=resize><span class="tag me">#213</span><div class=n>サムネイル作成</div><div class=m>ResizePhotoFunction</div><div class=d>3 つの大きさに縮め、<span class=m>photo-thumbnails</span> に置く</div></div>
+<div class="c new" id=moderate><span class=tag>新</span><div class=n>写真の判定</div><div class=m>ModeratePhotoFunction</div><div class=d>外部の判定 API に送り、不適切なら「非公開」にする</div></div>
+<div class="c new" id=publish><span class=tag>新</span><div class=n>公開</div><div class=m>PublishPhotoFunction</div><div class=d>判定を通った投稿を「公開」にし、フォロワーに知らせる</div></div>
+</div>
+
+<div class=c id=cdn><div class=n>CDN</div><div class=d>サムネイル（<span class=m>photo-thumbnails</span>）を配る</div></div>
+<div class="c mod" id=db><span class=tag>手を入れる</span><div class=n>DB</div><div class=d>投稿。<b style="color:var(--ok)">新しい列：</b><span class=m>photos.status</span>（処理待ち・公開・非公開）</div></div>
+<div class=c id=push><div class=n>プッシュ通知</div><div class=d>フォロワーのアプリへ</div></div>
+
+</div></div>
+</div>
+<script>
+// [from, to, from の辺, to の辺, ラベル, ラベルの位置, ラベルの置き方]（assets/arrows.js の先頭を参照）
+window.ARROWS=[
+ ['form','upload','r','l','写真を送る',0.15,'right'],
+ ['feed','feedapi','r','l',''],
+ ['upload','originals','r','l','原本を置く',0.25,'right'],
+ ['feedapi','db','b','t','公開の投稿を読む'],
+ ['feed','cdn','b','t','サムネイル'],
+ ['originals','event','b','t',''],
+ ['event','resize','b','t',''],
+ ['resize','moderate','b','t',''],
+ ['moderate','publish','b','t','問題なし'],
+ ['publish','db','l','tr','公開にする',0.4,'left'],
+ ['publish','push','b','t','知らせる'],
+];
+</script>
+<script src=../assets/arrows.js></script>
