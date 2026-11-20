@@ -1,6 +1,7 @@
 ---
 name: pr-figures
 description: PR の本文に貼る図（その PR の概要の図、関連する PR の全体像の図、機能を構成するコンポーネントを矢印でつないだ構成図）を HTML から PNG に描き、本文の先頭の「## 図」の節に貼る。「PR に図を貼って」「PR の概要と全体像の画像を作って」「構成図を作って」「PR の説明に画像を足して」と言われたときに使う。動作確認の画面の撮影はこのスキルの範囲外。
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/roadmap.py *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/render.py *)
 ---
 
 # PR の図
@@ -13,7 +14,7 @@ description: PR の本文に貼る図（その PR の概要の図、関連する
 - **全体像の図**: 同じタスクの PR を、リポジトリごとの列に左から入れる順で並べ、この PR を強調する。タスクの PR が 1 本だけなら作らない
 - **構成図**: タスクが作る機能を構成するコンポーネント（キュー・ワーカー・ジョブ・usecase・DB・外部サービス・画面など）を箱にし、呼び出しとデータの流れを矢印でつなぐ。タスクの最終形を 1 つ描き、同じタスクの各 PR に貼る（その PR で作る部品だけ色を変える）。部品が 3 つに満たない変更（文言・1 画面の見た目だけなど）なら作らない
 
-作業フォルダは一時フォルダの `pr-figs/`（無ければ作る）。スクリプトはこのスキルの `scripts/` にある。
+作業フォルダは一時フォルダの `pr-figs/`（無ければ作る）。このスキルのフォルダは `${CLAUDE_SKILL_DIR}` で、スクリプトは `scripts/`、雛形は `examples/`、部品の CSS と JS は `assets/` にある。
 
 前提: Python 3 と Pillow（`pip install pillow`）、Google Chrome（または Chromium）、`gh`（GitHub CLI、ログイン済み）。Chrome の場所が既定と違うときは環境変数 `CHROME_PATH` で渡す。
 
@@ -32,7 +33,7 @@ description: PR の本文に貼る図（その PR の概要の図、関連する
 `roadmap.json` を書き（形は `scripts/roadmap.py` の先頭）、次を実行する。`current` に並べた PR ごとに 1 枚できる。
 
 ```sh
-python3 <skill>/scripts/roadmap.py pr-figs/roadmap.json pr-figs/
+python3 ${CLAUDE_SKILL_DIR}/scripts/roadmap.py pr-figs/roadmap.json pr-figs/
 ```
 
 - レーンはリポジトリ（バックエンド・フロントエンドなど）。カードの中身は PR の中身を 1 行で書く。後続の作業は番号を「次」にし、前提の PR があれば `note` に「前提: #番号」と書く
@@ -42,7 +43,7 @@ python3 <skill>/scripts/roadmap.py pr-figs/roadmap.json pr-figs/
 
 ### 3. 概要の図を作る
 
-`examples/` の型から 1 つ選び、`pr-figs/overview-<番号>.html` に写して中身を書き換える（CSS の参照先 `../assets/` は `pr-figs/` からの位置に直す。`render.py` は参照先に CSS が無ければ `assets/` からコピーする）。
+`${CLAUDE_SKILL_DIR}/examples/` の型から 1 つ選び、`pr-figs/overview-<番号>.html` に写して中身を書き換える（CSS の参照先 `../assets/` は `pr-figs/` からの位置に直す。`render.py` は参照先に CSS が無ければ `assets/` からコピーする）。
 
 | 型 | 使うとき | 例 |
 |---|---|---|
@@ -85,7 +86,7 @@ python3 <skill>/scripts/roadmap.py pr-figs/roadmap.json pr-figs/
 ### 5. PNG にして目で確かめる
 
 ```sh
-python3 <skill>/scripts/render.py pr-figs/overview-*.html pr-figs/roadmap-*.html pr-figs/components-*.html
+python3 ${CLAUDE_SKILL_DIR}/scripts/render.py pr-figs/overview-*.html pr-figs/roadmap-*.html pr-figs/components-*.html
 ```
 
 できた PNG を 1 枚ずつ開き、次を探して HTML を直し、描き直す: 文字やカードのはみ出し・切れ、不自然な折り返し（1 文字だけ次の行、単語や識別子の途中など）、矢印のあとで折り返した流れ、下の切れ。構成図では、箱の裏や隣の列を通る矢印、ラベルが箱・札・枠・別の矢印に隠れていないか、右端の切れと右の余白も見る。説明の最後の 1〜2 文字だけが次の行に落ちたら、幅を変えずに文を短くする。複数の PR に同じ図を色だけ変えて貼るときも、札の幅が変わるので、少なくとも `.me` の位置が違う 2 枚は開く。`render.py` が「下端まで中身がある」と出したら、その図は下が切れている。
@@ -97,7 +98,7 @@ python3 <skill>/scripts/render.py pr-figs/overview-*.html pr-figs/roadmap-*.html
 PR ごとに実行する。本文の先頭に「## 図」の節を置き（既にあれば差し替え）、画像を上げてリンクを書き換える。
 
 ```sh
-python3 <skill>/scripts/attach.py <owner/repo> <番号> pr-figs/overview-<番号>.png pr-figs/roadmap-<番号>.png pr-figs/components-<番号>.png \
+python3 ${CLAUDE_SKILL_DIR}/scripts/attach.py <owner/repo> <番号> pr-figs/overview-<番号>.png pr-figs/roadmap-<番号>.png pr-figs/components-<番号>.png \
   --alt "この PR の概要" --alt "<タスク名> の PR の全体像（この PR の位置）" --alt "<機能名> の構成図"
 ```
 

@@ -1,0 +1,18 @@
+{
+  "name": "pr-figures",
+  "version": "1.0.0",
+  "description": "PR の本文に貼る図（概要・全体像・構成図）を HTML から PNG に描いて貼る",
+  "author": {
+    "name": "Tetsuya Yamada",
+    "url": "https://github.com/yamatechi"
+  },
+  "homepage": "https://github.com/yamatechi/pr-figures",
+  "repository": "https://github.com/yamatechi/pr-figures",
+  "license": "MIT",
+  "keywords": [
+    "pull-request",
+    "diagram",
+    "documentation",
+    "png"
+  ]
+}

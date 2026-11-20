@@ -36,11 +36,27 @@ PR の本文に貼る図を、HTML から PNG に描いて貼るための [Agent
 
 ## 入れ方
 
+Claude Code のプラグインとして入れる（おすすめ）。セッションの中で次を打つ。
+
+```text
+/plugin marketplace add yamatechi/pr-figures
+/plugin install pr-figures@pr-figures
+```
+
+シェルからなら:
+
+```sh
+claude plugin marketplace add yamatechi/pr-figures
+claude plugin install pr-figures@pr-figures
+```
+
+更新は `/plugin marketplace update pr-figures` のあと `claude plugin update pr-figures@pr-figures`。
+
+プラグインにせず、スキルとして直接置くこともできる。
+
 ```sh
 git clone https://github.com/yamatechi/pr-figures ~/.claude/skills/pr-figures
 ```
-
-プロジェクトだけで使うなら `<リポジトリ>/.claude/skills/pr-figures` に置く。
 
 必要なもの:
 
@@ -50,7 +66,7 @@ git clone https://github.com/yamatechi/pr-figures ~/.claude/skills/pr-figures
 
 ## 使い方
 
-エージェントに「この PR に図を貼って」「構成図を作って」と頼む。手順は [SKILL.md](SKILL.md) にある。
+Claude Code に「この PR に図を貼って」「構成図を作って」と頼むと、このスキルが使われる。プラグインとして入れたときは `/pr-figures:pr-figures` で明示的に呼べる。手順は [SKILL.md](SKILL.md) にある。
 
 スクリプトを直接使うこともできる。
 
@@ -69,6 +85,7 @@ python3 scripts/attach.py <owner/repo> <PR 番号> pr-figs/overview-123.png pr-f
 ## 構成
 
 ```
+.claude-plugin/                  プラグインと marketplace の定義
 SKILL.md                         手順と描き方の決まり
 scripts/roadmap.py               全体像の図を JSON から作る
 scripts/render.py                HTML → PNG（Chrome headless）

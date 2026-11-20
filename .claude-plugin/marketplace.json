@@ -1,0 +1,14 @@
+{
+  "name": "pr-figures",
+  "description": "PR の本文に貼る図（概要・全体像・構成図）を HTML から PNG に描いて貼る Agent Skill",
+  "owner": { "name": "Tetsuya Yamada", "url": "https://github.com/yamatechi" },
+  "plugins": [
+    {
+      "name": "pr-figures",
+      "source": "./",
+      "description": "PR の本文に貼る図（概要・全体像・構成図）を HTML から PNG に描いて貼る",
+      "category": "productivity",
+      "tags": ["pull-request", "diagram", "documentation"]
+    }
+  ]
+}
